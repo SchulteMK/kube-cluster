@@ -10,7 +10,7 @@ curl -sfL https://get.k3s.io | sh -s - server --write-kubeconfig-mode 644 --clus
 extract kubeconfig with `cat /etc/rancher/k3s/k3s.yaml` and copy it to local path `.kube/config` on your admin machine. Replace the local ip adress with the actual ip of the node. You should be able to connect to the freshly installed k3s instance and list your first node with `kubectl get nodes`.
 The output should look something like this:
 
-![cluster nodes without cni installed](img\nodes-noCNI.png)
+![cluster nodes without cni installed](img/nodes-noCNI.png)
 
 ### cilium deployment
 install cilium cli to your admin machine:
@@ -30,10 +30,10 @@ cilium install --set ipv6.enabled=true,bgpControlPlane.enabled=true
 `
 
 After that you can wait until the deployment is done with `cilium status --wait`. After the deployment finishes, your node should be ready `kubectl get nodes`:
-![cluster nodes with cni installed](img\nodes-CNI.png)
+![cluster nodes with cni installed](img/nodes-CNI.png)
 
 You can also take a look at all the deployed pods `kubectl get pods -A`:
-![empty cluster after cni installation](img\pods-emptyCluster.png)
+![empty cluster after cni installation](img/pods-emptyCluster.png)
 
 Now the k3s cluster with cilium cli is sucessfully deployed.
 
