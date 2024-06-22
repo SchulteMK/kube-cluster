@@ -13,7 +13,7 @@ The output should look something like this:
 ![cluster nodes without cni installed](img/nodes-noCNI.png)
 
 ### cilium deployment
-install cilium cli to your admin machine:
+install cilium cli to your admin machine ([cilium.io](https://docs.cilium.io/en/stable/gettingstarted/k8s-install-default/#install-the-cilium-cli)):
 ```bash
 CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
 CLI_ARCH=amd64
@@ -36,6 +36,24 @@ You can also take a look at all the deployed pods `kubectl get pods -A`:
 ![empty cluster after cni installation](img/pods-emptyCluster.png)
 
 Now the k3s cluster with cilium cli is sucessfully deployed.
+
+## Argo CD
+[Argo CD](https://argo-cd.readthedocs.io/en/stable/) is a declarative, GitOps continuous delivery tool for Kubernetes. We are going to deploy everything declarative through argocd. 
+
+### Option A
+First we will deploy argocd manually, afterwards we will add the argocd deployment as an application to argocd itself. This way argocd will manage itself after its initial deployment.
+
+### Option B
+Create argocd application yaml files. Deploy argocd including the application to manage itself.
+
+---
+---
+---
+non structures notes below
+
+---
+---
+---
 
 ## infrastructure apps
 ### argocd deployment
