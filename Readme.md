@@ -35,25 +35,40 @@ After that you can wait until the deployment is done with `cilium status --wait`
 You can also take a look at all the deployed pods `kubectl get pods -A`:
 ![empty cluster after cni installation](img/pods-emptyCluster.png)
 
-Now the k3s cluster with cilium cli is sucessfully deployed.
+Now the k3s cluster with cilium cli is sucessfully deployed. Now would be a great time to create a vm snapshot. If something goes wrong, you always come back to this point in time.
 
 ## Argo CD
 [Argo CD](https://argo-cd.readthedocs.io/en/stable/) is a declarative, GitOps continuous delivery tool for Kubernetes. We are going to deploy everything declarative through argocd. 
+
+install [argocd cli](https://argo-cd.readthedocs.io/en/stable/cli_installation/#download-with-curl):
+```
+curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+rm argocd-linux-amd64
+```
+
+We are starting with a [default deployment](https://argo-cd.readthedocs.io/en/stable/getting_started/#1-install-argo-cd) to get started: 
+```
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+
+We can not yet expose argocd with an `LoadBalancer`, because our cilium installation cannot route any bgp traffic nor hand out any ips. So just for the initial setup we making use of the port forwarding included in `kubectl`: `kubectl port-forward svc/argocd-server -n argocd 8080:443`. We can retrieve the default admin credentials via `argocd admin initial-password -n argocd`, or just by reading the secret named `argocd-initial-admin-secret`: `kubectl get secret -n argocd argocd-initial-admin-secret --template={{.data.password}} | base64 -d`
+
+You can login through the webinterface (https://localhost:8080/) or through the cli as described [here](https://argo-cd.readthedocs.io/en/stable/getting_started/#4-login-using-the-cli). First of we are gonna change the initial admin password and afterwards delete the secret containing it: `kubectl delete secret -n argocd argocd-initial-admin-secret`
+
+### First argocd application
+
+
+---
+non structures notes below
+---
 
 ### Option A
 First we will deploy argocd manually, afterwards we will add the argocd deployment as an application to argocd itself. This way argocd will manage itself after its initial deployment.
 
 ### Option B
 Create argocd application yaml files. Deploy argocd including the application to manage itself.
-
----
----
----
-non structures notes below
-
----
----
----
 
 ## infrastructure apps
 ### argocd deployment
