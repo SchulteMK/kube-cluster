@@ -35,6 +35,9 @@ After that you can wait until the deployment is done with `cilium status --wait`
 You can also take a look at all the deployed pods `kubectl get pods -A`:
 ![empty cluster after cni installation](img/pods-emptyCluster.png)
 
+You can check your cilium deployment and node connectivity with `cilium connectivity test`. This should result in: \
+`✅ [cilium-test] All 45 tests (290 actions) successful, 35 tests skipped, 1 scenarios skipped.`
+
 Now the k3s cluster with cilium cli is sucessfully deployed. Now would be a great time to create a vm snapshot. If something goes wrong, you always come back to this point in time.
 
 ## Argo CD
@@ -58,7 +61,48 @@ We can not yet expose argocd with an `LoadBalancer`, because our cilium installa
 You can login through the webinterface (https://localhost:8080/) or through the cli as described [here](https://argo-cd.readthedocs.io/en/stable/getting_started/#4-login-using-the-cli). First of we are gonna change the initial admin password and afterwards delete the secret containing it: `kubectl delete secret -n argocd argocd-initial-admin-secret`
 
 ### First argocd application
+Let´s get started with our first deployment. We will start with an easy deployment that does not any customization. Our first deployment will be [sealed-secrets](https://github.com/bitnami-labs/sealed-secrets). We really don´t need the deployment at this point in time yet, but it is very simple to deploy.
+Use the webinterface to create an application, give it a name, put it in the default project for now, enter the url https://bitnami-labs.github.io/sealed-secrets as an helm chart, pick the correct chart and the latest version, choose in-cluster as your destination cluster name and `kube-system` as your namespace, you do not need to edit any helm parameters. 
 
+After the application is created, you need to sync the application, to apply the displayed resources. You can go with the default options for now. You can watch the resources being deployed and getting ready (green).
+
+For me everything gets deployed successfully, but the sync status is still `OutOfSync`. This is due to the autmatically created `CiliumIdentity` by our cni cilium. You can delete resource, but it will be recreated instantly. To display our application sync status as `Synced`, we are going to ignore the `CiliumIdentity` CRD completly in argocd. \
+We need to patch the argocd config map `kubectl edit cm argocd-cm -n argocd` and add the following section to the config map: 
+```yaml
+data:
+  resource.exclusions: |
+    - apiGroups:
+      - cilium.io
+      kinds:
+      - CiliumIdentity
+      clusters:
+      - "*"
+```
+Attention! If you already got an data and/or resource.exclusions section, you need add the new values to the already present sections.
+
+After patching the argocd config, your application should be `Healthy` and `Synced`:
+![Healthy first deployment](img/argocd-healtyApp.png)
+
+Using the webinterface is one way of creating an application, you can also create the `Application` yaml by hand and apply it with `kubectl`. At the end both ways will result in an `Application` deployend in the argocd namespace.
+
+We can extract the yaml definition of the already deployed `Application` by `kubectl get application -n argocd sealed-secrets -o yaml > sealed-secrets.yaml`. The newly created file sealed-secrets.yaml contains the complete state of the `Application`, but we are only interested in the declarative definition of the `Application` CRD and not in it´s current state. After we delete the `status` section from the file, we can also delete `creationTimestamp`, `generation`, `resourceVersion`, `uid` from the `metadata` section and afterwards it should look something like this:
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sealed-secrets
+  namespace: argocd
+spec:
+  destination:
+    name: in-cluster
+    namespace: kube-system
+  project: default
+  source:
+    chart: sealed-secrets
+    repoURL: https://bitnami-labs.github.io/sealed-secrets
+    targetRevision: 2.16.0
+```
 
 ---
 non structures notes below
