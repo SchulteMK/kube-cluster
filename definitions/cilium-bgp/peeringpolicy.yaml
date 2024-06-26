@@ -4,11 +4,11 @@ metadata:
  name: bgp-peering-policy
 spec: 
  virtualRouters: 
- - localASN: 64500
-   exportPodCIDR: false
+ - localASN: 64502
+   exportPodCIDR: true
    neighbors: 
     - peerAddress: 'fd88:a096:3751:8888::1/128'
-      peerASN: 64501
+      peerASN: 64500
       eBGPMultihopTTL: 10
       connectRetryTimeSeconds: 120
       holdTimeSeconds: 90
