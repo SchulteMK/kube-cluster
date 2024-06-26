@@ -5,7 +5,7 @@ metadata:
 spec: 
  virtualRouters: 
  - localASN: 64502
-   exportPodCIDR: true
+   exportPodCIDR: false
    neighbors: 
     - peerAddress: 'fd88:a096:3751:8888::1/128'
       peerASN: 64500
