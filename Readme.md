@@ -56,7 +56,9 @@ kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 ```
 
-We can not yet expose argocd with an `LoadBalancer`, because our cilium installation cannot route any bgp traffic nor hand out any ips. So just for the initial setup we making use of the port forwarding included in `kubectl`: `kubectl port-forward svc/argocd-server -n argocd 8080:443`. We can retrieve the default admin credentials via `argocd admin initial-password -n argocd`, or just by reading the secret named `argocd-initial-admin-secret`: `kubectl get secret -n argocd argocd-initial-admin-secret --template={{.data.password}} | base64 -d`
+We can not yet expose argocd with an `LoadBalancer`, because our cilium installation cannot route any bgp traffic nor hand out any ips. So just for the initial setup we making use of the port forwarding included in `kubectl`: `kubectl port-forward svc/argocd-server -n argocd 8080:443`. \
+We can retrieve the default admin credentials via `argocd admin initial-password -n argocd`, or just by reading the secret named `argocd-initial-admin-secret`: \
+`kubectl get secret -n argocd argocd-initial-admin-secret --template={{.data.password}} | base64 -d`
 
 You can login through the webinterface (https://localhost:8080/) or through the cli as described [here](https://argo-cd.readthedocs.io/en/stable/getting_started/#4-login-using-the-cli). First of we are gonna change the initial admin password and afterwards delete the secret containing it: `kubectl delete secret -n argocd argocd-initial-admin-secret`
 
@@ -103,6 +105,22 @@ spec:
     repoURL: https://bitnami-labs.github.io/sealed-secrets
     targetRevision: 2.16.0
 ```
+
+## Loadbalancing
+We are going to make use of the cilium `LoadBalancer` with the addition of bgp-routing. The [Border Gateway Protocol](https://de.wikipedia.org/wiki/Border_Gateway_Protocol) (BGP) helps us to route a one of our ip addresses from our router to our cluster services. The real advantages come into play on a multi-node cluster. Multiple paths across the nodes are published as bgp-routes; -> more HA, more flexibility.
+\
+To use bgp within cilium we need to create a `CiliumBGPPeeringPolicy`. We will start with the yaml from the [documentation](https://docs.cilium.io/en/stable/network/bgp-control-plane/#ciliumbgppeeringpolicy-crd), choose an local ASN (like 64500), change the neighbor-peer data and add an `serviceSelector` that matches every node, resulting in something like [this](definitions/cilium-bgp/peeringpolicy.yaml).
+\
+To deploy our newly created PeeringPolicy we create an argocd application like [this](definitions/argocd-applications/cilium-bgp.yaml) and depoly it´s manifest to the cluster and sync the application.
+
+After the successful `CiliumBGPPeeringPolicy` deplpoyment and **external bgp router configuration**, the connection can be displayed by `cilium bgp peers`:
+![bgp peers](img/cilium-bgpPeers.png)
+It should show an established session state and an uptime.
+
+We are now able to announce routes via bgp, but we currently have nothing to announce. We need a way to assign an ip address to a service. This can be done by [cilium ip address management (IPAM)](https://docs.cilium.io/en/stable/network/concepts/ipam/#ip-address-management-ipam). We just need to deploy an `CiliumLoadBalancerIPPool` to enable this feature and start handing out ip addresses to our `LoadBalancer` services. \
+Add the [ipool.yaml](definitions/cilium-bgp/ippool.yaml) to the repo and resync the app.
+
+
 
 ---
 non structures notes below
