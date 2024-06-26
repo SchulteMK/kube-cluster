@@ -109,7 +109,7 @@ spec:
 ## Loadbalancing
 We are going to make use of the cilium `LoadBalancer` with the addition of bgp-routing. The [Border Gateway Protocol](https://de.wikipedia.org/wiki/Border_Gateway_Protocol) (BGP) helps us to route a one of our ip addresses from our router to our cluster services. The real advantages come into play on a multi-node cluster. Multiple paths across the nodes are published as bgp-routes; -> more HA, more flexibility.
 \
-To use bgp within cilium we need to create a `CiliumBGPPeeringPolicy`. We will start with the yaml from the [documentation](https://docs.cilium.io/en/stable/network/bgp-control-plane/#ciliumbgppeeringpolicy-crd), choose an local ASN (like 64500), change the neighbor-peer data and add an `serviceSelector` that matches every node, resulting in something like [this](definitions/cilium-bgp/peeringpolicy.yaml).
+To use bgp within cilium we need to create a `CiliumBGPPeeringPolicy`. We will start with the yaml from the [documentation](https://docs.cilium.io/en/stable/network/bgp-control-plane/#ciliumbgppeeringpolicy-crd), choose an local ASN (like 64500), change the neighbor-peer data and add an `serviceSelector` that matches every service, resulting in something like [this](definitions/cilium-bgp/peeringpolicy.yaml).
 \
 To deploy our newly created PeeringPolicy we create an argocd application like [this](definitions/argocd-applications/cilium-bgp.yaml) and depoly it´s manifest to the cluster and sync the application.
 
@@ -120,7 +120,12 @@ It should show an established session state and an uptime.
 We are now able to announce routes via bgp, but we currently have nothing to announce. We need a way to assign an ip address to a service. This can be done by [cilium ip address management (IPAM)](https://docs.cilium.io/en/stable/network/concepts/ipam/#ip-address-management-ipam). We just need to deploy an `CiliumLoadBalancerIPPool` to enable this feature and start handing out ip addresses to our `LoadBalancer` services. \
 Add the [ipool.yaml](definitions/cilium-bgp/ippool.yaml) to the repo and resync the app.
 
+To test both our automatic ip address assignment and the bgp announcement, we can patch our argocd service type from `ClusterIP` to `LoadBalancer` (`kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'`). Following things should happen:
+1. An ip address should be assigned
+1. The newly assigned ip address should be announced via bgp immediately
+1. The service should be reachable from outside the cluster via it´s ip address
 
+You can check the assignment with `kubectl get svc -n argocd` and get an external ip, the advertisement with `cilium bgp routes advertised ipv6 unicast`.
 
 ---
 non structures notes below
