@@ -9,6 +9,6 @@ spec:
     namespace: kube-system
   project: default
   source:
-    path: definitions/cilium-bgp
     repoURL: https://github.com/SchulteMK/kube-cluster.git
+    path: definitions/cilium-bgp
     targetRevision: HEAD

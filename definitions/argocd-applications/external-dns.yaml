@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: external-dns
+  namespace: external-dns
+spec:
+  destination:
+    name: in-cluster
+    namespace: kube-system
+  project: default
+  sources:
+  - repoURL: 'https://kubernetes-sigs.github.io/external-dns/'
+    targetRevision: 1.14.5
+    chart: external-dns
+    helm:
+      valueFiles:
+      - $values/values.yaml
+  - repoURL: https://github.com/SchulteMK/kube-cluster.git
+    path: definitions/external-dns
+    targetRevision: HEAD
+    ref: values
