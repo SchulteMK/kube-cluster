@@ -9,8 +9,8 @@
   "spec": {
     "template": {
       "metadata": {
-        "name": "mysecret",
-        "namespace": "default",
+        "name": "cloudflare-api",
+        "namespace": "external-dns",
         "creationTimestamp": null
       }
     },
