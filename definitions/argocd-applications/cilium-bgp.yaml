@@ -7,7 +7,7 @@ spec:
   destination:
     name: in-cluster
     namespace: kube-system
-  project: default
+  project: infrastructure
   source:
     repoURL: https://github.com/SchulteMK/kube-cluster.git
     path: definitions/cilium-bgp
