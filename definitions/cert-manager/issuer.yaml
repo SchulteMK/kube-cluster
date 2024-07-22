@@ -9,7 +9,7 @@ spec:
     privateKeySecretRef:
       name: acme-staging-account-key
     solvers:
-    - cf-dns:
+    - dns01:
         cloudflare:
           apiTokenSecretRef:
             name: cloudflare-api
