@@ -8,6 +8,9 @@ spec:
   destination:
     name: in-cluster
     namespace: cert-manager
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
   sources: 
   - repoURL: 'https://charts.jetstack.io'
     targetRevision: v1.15.1
