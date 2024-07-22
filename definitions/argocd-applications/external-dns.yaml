@@ -19,6 +19,7 @@ spec:
       valuesObject:
         provider: 
           name: cloudflare
+        fullnameOverride: sealed-secrets-controller
         env:
           - name: CF_API_TOKEN
             valueFrom:
