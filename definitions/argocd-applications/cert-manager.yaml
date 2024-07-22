@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: argocd
+spec:
+  project: infrastructure
+  destination:
+    name: in-cluster
+    namespace: cert-manager
+  sources: 
+  - repoURL: 'https://charts.jetstack.io'
+    targetRevision: v1.15.1
+    chart: cert-manager
+    helm:
+      parameters:
+        - name: crds.enabled
+          value: 'true'
+  - repoURL: https://github.com/SchulteMK/kube-cluster.git
+    targetRevision: HEAD
+    path: definitions/cert-manager

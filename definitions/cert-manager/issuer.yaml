@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: acme-staging
+spec:
+  acme:
+    email: admin@kocks.info
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: acme-staging-account-key
+    solvers:
+    - cf-dns:
+        cloudflare:
+          apiTokenSecretRef:
+            name: cloudflare-api
+            key: apiKey
