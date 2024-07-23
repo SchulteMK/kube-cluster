@@ -15,4 +15,4 @@ spec:
 
   issuerRef:
     kind: ClusterIssuer
-    name: acme-staging
+    name: acme-prod
