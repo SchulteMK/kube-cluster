@@ -4,10 +4,10 @@ metadata:
   name: external-dns
   namespace: argocd
 spec:
+  project: infrastructure
   destination:
     name: in-cluster
     namespace: external-dns
-  project: infrastructure
   syncPolicy:
     syncOptions:
       - CreateNamespace=true

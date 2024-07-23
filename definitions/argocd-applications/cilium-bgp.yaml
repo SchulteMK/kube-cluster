@@ -4,10 +4,10 @@ metadata:
   name: cilium-bgp
   namespace: argocd
 spec:
+  project: infrastructure
   destination:
     name: in-cluster
     namespace: kube-system
-  project: infrastructure
   source:
     repoURL: https://github.com/SchulteMK/kube-cluster.git
     path: definitions/cilium-bgp

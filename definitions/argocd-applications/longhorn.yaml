@@ -8,6 +8,9 @@ spec:
   destination:
     name: in-cluster
     namespace: longhorn-system
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
   sources:
     - chart: longhorn
       repoURL: https://charts.longhorn.io/
