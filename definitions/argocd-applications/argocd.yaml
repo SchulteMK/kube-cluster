@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  project: infrastructure
+  destination:
+    name: in-cluster
+    namespace: kube-system
+  source:
+    repoURL: https://github.com/SchulteMK/kube-cluster.git
+    path: definitions/argocd
+    targetRevision: HEAD
