@@ -8,11 +8,11 @@ spec:
     name: in-cluster
     namespace: kube-system
   project: infrastructure
-  source:
-    repoURL: https://github.com/SchulteMK/kube-cluster.git
-    path: definitions/cilium-bgp
-    targetRevision: HEAD
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+  source:
+    repoURL: https://github.com/SchulteMK/kube-cluster.git
+    path: definitions/cilium-bgp
+    targetRevision: HEAD

@@ -9,6 +9,9 @@ spec:
     namespace: external-dns
   project: infrastructure
   syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true
   sources:
@@ -28,7 +31,3 @@ spec:
   - repoURL: https://github.com/SchulteMK/kube-cluster.git
     targetRevision: HEAD
     path: definitions/external-dns
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
