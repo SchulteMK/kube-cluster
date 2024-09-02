@@ -12,3 +12,7 @@ spec:
     repoURL: https://github.com/SchulteMK/kube-cluster.git
     path: definitions/cilium-bgp
     targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
