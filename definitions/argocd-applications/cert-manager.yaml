@@ -4,10 +4,10 @@ metadata:
   name: cert-manager
   namespace: argocd
 spec:
-  project: infrastructure
   destination:
     name: in-cluster
     namespace: cert-manager
+  project: infrastructure
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
@@ -22,3 +22,7 @@ spec:
   - repoURL: https://github.com/SchulteMK/kube-cluster.git
     targetRevision: HEAD
     path: definitions/cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

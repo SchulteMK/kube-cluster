@@ -4,11 +4,15 @@ metadata:
   name: argocd
   namespace: argocd
 spec:
-  project: infrastructure
   destination:
     name: in-cluster
     namespace: kube-system
+  project: infrastructure
   source:
     repoURL: https://github.com/SchulteMK/kube-cluster.git
     path: definitions/argocd
     targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
